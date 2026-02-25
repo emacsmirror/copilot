@@ -1396,6 +1396,28 @@ Uppercase CHAR disables `case-fold-search', mirroring `zap-to-char'."
             (pcase-let ((`(,start ,end ,balanced-text) fixed-completion))
               (copilot--display-overlay-completion balanced-text command full-insert-text start end))))))))
 
+(defun copilot--ensure-doc-open ()
+  "Ensure the current buffer has been opened with the Copilot server.
+Sends workspace folder and `textDocument/didOpen' notifications if
+the buffer has not been registered yet.  Safe to call multiple times."
+  (when-let* ((root (copilot--workspace-root))
+              (root-uri (copilot--path-to-uri root)))
+    (unless (member root-uri copilot--workspace-folders)
+      (push root-uri copilot--workspace-folders)
+      (copilot--notify 'workspace/didChangeWorkspaceFolders
+                       (list :event
+                             (list :added (vector (list :uri root-uri
+                                                        :name (file-name-nondirectory
+                                                               (directory-file-name root))))
+                                   :removed [])))))
+  (unless (seq-contains-p copilot--opened-buffers (current-buffer))
+    (add-to-list 'copilot--opened-buffers (current-buffer))
+    (copilot--notify 'textDocument/didOpen
+                     (list :textDocument (list :uri (copilot--get-uri)
+                                               :languageId (copilot--get-language-id)
+                                               :version copilot--doc-version
+                                               :text (copilot--get-source))))))
+
 (defun copilot--on-doc-focus (window)
   "Notify that the document WINDOW has been focussed or opened."
   ;; When switching windows, this function is called twice, once for the
@@ -1403,26 +1425,10 @@ Uppercase CHAR disables `case-fold-search', mirroring `zap-to-char'."
   ;; send a notification for the window gaining focus and only if the buffer has
   ;; copilot-mode enabled.
   (when (and copilot-mode (eq window (selected-window)))
-    ;; Detect new workspace roots and notify the server.
-    (when-let* ((root (copilot--workspace-root))
-                (root-uri (copilot--path-to-uri root)))
-      (unless (member root-uri copilot--workspace-folders)
-        (push root-uri copilot--workspace-folders)
-        (copilot--notify 'workspace/didChangeWorkspaceFolders
-                         (list :event
-                               (list :added (vector (list :uri root-uri
-                                                          :name (file-name-nondirectory
-                                                                 (directory-file-name root))))
-                                     :removed [])))))
     (if (seq-contains-p copilot--opened-buffers (current-buffer))
         (copilot--notify 'textDocument/didFocus
                          (list :textDocument (list :uri (copilot--get-uri))))
-      (add-to-list 'copilot--opened-buffers (current-buffer))
-      (copilot--notify 'textDocument/didOpen
-                       (list :textDocument (list :uri (copilot--get-uri)
-                                                 :languageId (copilot--get-language-id)
-                                                 :version copilot--doc-version
-                                                 :text (copilot--get-source)))))))
+      (copilot--ensure-doc-open))))
 
 (defun copilot--on-doc-close (&rest _args)
   "Notify that the document has been closed."
@@ -1436,6 +1442,7 @@ Uppercase CHAR disables `case-fold-search', mirroring `zap-to-char'."
 (defun copilot-complete ()
   "Complete at the current point."
   (interactive)
+  (copilot--ensure-doc-open)
   (setq copilot--last-doc-version copilot--doc-version)
 
   (setq copilot--completion-cache nil)

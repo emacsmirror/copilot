@@ -920,7 +920,36 @@
   (describe "copilot--path-to-uri"
     (it "creates a file URI for unix paths"
       (expect (copilot--path-to-uri "/home/user/project")
-              :to-match "^file:///home/user/project"))))
+              :to-match "^file:///home/user/project")))
+
+  (describe "copilot--ensure-doc-open"
+    (it "sends didOpen when buffer is not yet registered"
+      (with-temp-buffer
+        (emacs-lisp-mode)
+        (insert "(+ 1 2)")
+        (let ((copilot--opened-buffers nil)
+              (copilot--connection t))
+          (spy-on 'jsonrpc--process :and-return-value t)
+          (spy-on 'process-exit-status :and-return-value 0)
+          (spy-on 'jsonrpc-notify)
+          (copilot--ensure-doc-open)
+          (expect (seq-contains-p copilot--opened-buffers (current-buffer))
+                  :to-be-truthy)
+          ;; Should have sent textDocument/didOpen
+          (let ((calls (spy-calls-all-args 'jsonrpc-notify)))
+            (expect (cl-some (lambda (args) (eq (nth 1 args) 'textDocument/didOpen))
+                             calls)
+                    :to-be-truthy)))))
+
+    (it "is a no-op when buffer is already registered"
+      (with-temp-buffer
+        (let ((copilot--opened-buffers (list (current-buffer)))
+              (copilot--connection t))
+          (spy-on 'jsonrpc--process :and-return-value t)
+          (spy-on 'process-exit-status :and-return-value 0)
+          (spy-on 'jsonrpc-notify)
+          (copilot--ensure-doc-open)
+          (expect 'jsonrpc-notify :not :to-have-been-called))))))
 
 ;;
 ;; copilot-balancer
