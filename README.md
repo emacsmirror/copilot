@@ -424,6 +424,82 @@ But I decided to allow them to coexist, allowing you to choose a better one at a
 
 If you are using `whitespace-mode`, make sure to remove `newline-mark` from `whitespace-style`.
 
+## FAQ
+
+### Do I need a paid GitHub Copilot subscription?
+
+Not necessarily. GitHub introduced a [free tier](https://github.com/features/copilot#pricing) for Copilot in early 2025 that includes a limited number of completions per month. A paid subscription (Individual or Business) removes these limits.
+
+### TAB doesn't accept the completion
+
+This is usually caused by another package binding TAB in a way that takes
+priority. Common culprits include `company-mode`, `corfu`, `yasnippet`, and Evil
+mode. A few things to check:
+
+1. **Bind both `<tab>` and `TAB`.** In GUI Emacs these are different events —
+   `<tab>` is the function key and `TAB` is the `C-i` character. Some modes only
+   intercept one of them. The [Quick Start](#quick-start) example binds both.
+2. **Use the fish-style keybindings.** If TAB is hopelessly taken by another
+   package, bind acceptance to `<right>` / `C-f` instead. See
+   [Fish-style keybindings](#fish-style-keybindings).
+3. **Doom Emacs users** — see the [Doom Emacs](#doom-emacs) installation section
+   for a workaround using a custom Evil insert-state binding.
+
+### Can I use `copilot-complete` without enabling `copilot-mode`?
+
+Yes. You can call `M-x copilot-complete` manually in any buffer — it will start
+the server and open the document automatically. Use `copilot-clear-overlay` (or
+simply type) to dismiss the suggestion. This is useful if you prefer on-demand
+completions rather than automatic ones.
+
+### Completions are slow or not appearing
+
+A few things to try:
+
+1. **Run `M-x copilot-diagnose`** — it restarts the server and prints diagnostic
+   info. Look for `NotAuthorized` (subscription issue) or connection errors.
+2. **Check your network** — the language server needs to reach GitHub's API.  If
+   you're behind a proxy, configure `copilot-network-proxy`.
+3. **Large files** — buffers over `copilot-max-char` characters (default 100 000)
+   are skipped. You can raise the limit, but very large files will always be
+   slower.
+4. **Tune `copilot-idle-delay`** — the default is `0` (immediate). A small delay
+   (e.g. `0.2`) reduces server load when typing quickly.
+
+### How do I disable Copilot in certain modes or buffers?
+
+Use `copilot-disable-predicates` to add functions that return `t` when Copilot
+should stay quiet:
+
+```elisp
+;; Disable in org-mode
+(add-to-list 'copilot-disable-predicates
+             (lambda () (derived-mode-p 'org-mode)))
+```
+
+Or simply don't add `copilot-mode` to the hooks of modes you want to exclude.
+If you use `global-copilot-mode`, the predicate approach is the way to go.
+
+### Parentheses are unbalanced in Lisp completions
+
+Copilot.el includes a parentheses balancer that post-processes completions in
+Lisp modes (`emacs-lisp-mode`, `clojure-mode`, `scheme-mode`, etc.) to fix
+unbalanced delimiters. It is enabled by default. If you still see issues,
+make sure `copilot-enable-parentheses-balancer` is `t`, or file a bug report
+with the completion text and buffer context.
+
+If the balancer is causing problems for your workflow, you can disable it:
+
+```elisp
+(setopt copilot-enable-parentheses-balancer nil)
+```
+
+### How do I select a different completion model?
+
+Run `M-x copilot-select-completion-model` to interactively choose from the
+models available on your subscription. The selection is saved in
+`copilot-completion-model`. Set it to `nil` to revert to the server default.
+
 ## Reporting Bugs
 
 - Make sure you have restarted your Emacs (and rebuild the plugin if necessary) after updating the plugin.
