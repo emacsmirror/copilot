@@ -9,7 +9,7 @@
 ;;             Bozhidar Batsov <bozhidar@batsov.dev>
 ;; URL: https://github.com/copilot-emacs/copilot.el
 ;; Package-Requires: ((emacs "27.2") (editorconfig "0.8.2") (jsonrpc "1.0.14") (compat "30") (track-changes "1.4"))
-;; Version: 0.4.0-snapshot
+;; Version: 0.4.0
 ;; Keywords: convenience copilot
 
 ;; The MIT License (MIT)
@@ -153,7 +153,8 @@ When non-nil, completions in Lisp modes are adjusted to ensure that
 parentheses remain balanced within the surrounding top-level form.
 Set to nil to use completions from the server verbatim."
   :type 'boolean
-  :group 'copilot)
+  :group 'copilot
+  :package-version '(copilot . "0.4"))
 
 (defcustom copilot-indentation-alist
   (append '((emacs-lisp-mode lisp-indent-offset)
@@ -241,7 +242,7 @@ from available models."
   :type '(choice (const :tag "Default" nil)
                  (string :tag "Model ID"))
   :group 'copilot
-  :package-version '(copilot . "0.5"))
+  :package-version '(copilot . "0.4"))
 
 (defvar-local copilot--overlay nil
   "Overlay for Copilot completion.")

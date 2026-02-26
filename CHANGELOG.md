@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## 0.4.0 (2026-02-26)
+
 ### New Features
 
 - Send workspace folders (`rootUri` and `workspaceFolders`) during LSP initialization and dynamically notify the server when new project roots are encountered. This improves suggestion quality for multi-root workspaces.
@@ -32,6 +34,7 @@
 
 - Rewrite `copilot-balancer` to use `parse-partial-sexp` so that parens inside comments and strings are handled correctly. ([#440](https://github.com/copilot-emacs/copilot.el/issues/440))
 - Fix balancer dropping closing delimiters inside comments/strings when the server returns a replacement range covering them. ([#449](https://github.com/copilot-emacs/copilot.el/issues/449))
+- Fix `copilot-complete` not working without `copilot-mode` until `copilot-diagnose` is run, by sending `textDocument/didOpen` automatically. ([#450](https://github.com/copilot-emacs/copilot.el/issues/450))
 - Fix partial accept-by-word losing the replacement range tail, which caused suffix text to be deleted prematurely. ([#448](https://github.com/copilot-emacs/copilot.el/issues/448))
 - Send an empty JSON object instead of omitting `params` in JSON-RPC requests, fixing `signInInitiate` and other calls on newer language server versions. ([#445](https://github.com/copilot-emacs/copilot.el/issues/445))
 - Fix `copilot--lsp-pos` to use UTF-16 code unit offsets instead of Emacs character counts. Characters above U+FFFF (e.g. emoji) are now correctly reported as 2 UTF-16 code units.
