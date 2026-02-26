@@ -2,7 +2,7 @@
 
 (package "copilot"
          "0.4.0snapshot"
-         "An unofficial Copilot plugin")
+         "An Emacs plugin for GitHub Copilot")
 
 (website-url "https://github.com/copilot-emacs/copilot.el")
 (keywords "convenience" "copilot")

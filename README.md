@@ -9,7 +9,7 @@ Copilot.el is an Emacs plugin for GitHub Copilot.
 
 ![](assets/demo.gif)
 
-This plugin is unofficial, however it makes use of the official [@github/copilot-language-server][] provided by Microsoft.
+This plugin uses the official [@github/copilot-language-server][] provided by Microsoft.
 
 > [!NOTE]
 >

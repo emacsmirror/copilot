@@ -1,4 +1,4 @@
-;;; copilot.el --- An unofficial Copilot plugin -*- lexical-binding: t; -*-
+;;; copilot.el --- An Emacs plugin for GitHub Copilot -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022-2026 copilot-emacs maintainers
 
@@ -34,7 +34,7 @@
 
 ;;; Commentary:
 
-;; An unofficial Copilot plugin for Emacs
+;; An Emacs plugin for GitHub Copilot
 
 ;;; Code:
 
