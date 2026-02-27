@@ -208,6 +208,25 @@ To customize when completions trigger, see `copilot-enable-predicates` and `copi
 
 Alternatively, you can call `copilot-complete` manually and use `copilot-clear-overlay` in `post-command-hook` to dismiss completions.
 
+### Chat
+
+`copilot-chat` opens an interactive chat with GitHub Copilot using the `conversation/*` LSP methods. The chat buffer streams responses in real time and automatically provides the current buffer as context.
+
+```elisp
+;; Start a chat (or send a follow-up if one is already open)
+M-x copilot-chat
+
+;; Send selected code with an optional prompt
+M-x copilot-chat-send-region
+```
+
+Key bindings in the `*copilot-chat*` buffer:
+- **C-c RET** or **C-c C-c** — send a follow-up message
+- **C-c C-k** — reset the conversation
+
+Customization:
+- **`copilot-chat-model`** — model to use for chat (default `nil`, meaning server default)
+
 ### Next Edit Suggestions (NES)
 
 NES predicts the next edit you'll want to make anywhere in the file, based on your recent editing patterns. Unlike inline completions (ghost text at the cursor), NES suggestions can replace or delete existing text at any location.
@@ -354,6 +373,11 @@ For example:
 | **Navigation** | |
 | `copilot-next-completion` | Cycle to the next completion |
 | `copilot-previous-completion` | Cycle to the previous completion |
+| **Chat** | |
+| `copilot-chat` | Open Copilot Chat and send a message |
+| `copilot-chat-send` | Send a follow-up message in the current chat |
+| `copilot-chat-send-region` | Send the selected region as context with an optional prompt |
+| `copilot-chat-reset` | Destroy the current conversation and clear the chat buffer |
 | **Next Edit Suggestions** | |
 | `copilot-nes-mode` | Toggle NES in the current buffer |
 | `copilot-nes-accept` | Accept (or jump to) the current NES suggestion |
@@ -391,6 +415,9 @@ A few commonly tweaked variables:
 | `signInInitiate` / `signInConfirm` / `checkStatus` / `signOut` | Supported | Authentication flow |
 | `copilot/models` | Supported | Lists available completion models |
 | `getPanelCompletions` | Supported | Multiple suggestions in a panel buffer |
+| `conversation/create` | Supported | Start a new chat conversation |
+| `conversation/turn` | Supported | Send a follow-up chat message |
+| `conversation/destroy` | Supported | End a chat conversation |
 | `textDocument/copilotInlineEdit` | Supported | Next Edit Suggestions (NES) |
 
 ### Client-to-Server Notifications
@@ -418,6 +445,7 @@ A few commonly tweaked variables:
 |--------|--------|-------|
 | `window/showMessageRequest` | Supported | Prompts via `completing-read` |
 | `window/showDocument` | Supported | Opens URIs in browser or Emacs |
+| `conversation/context` | Supported | Provides editor context for chat |
 
 ### Server-to-Client Notifications
 
@@ -571,13 +599,9 @@ These projects helped me a lot:
 
 ## Do you want to chat with GitHub Copilot?
 
-Just like the copilot plugin for Intellij or VS Code?
-
-Please take a look at [copilot-chat.el](https://github.com/chep/copilot-chat.el)
-
-> [!NOTE]
->
-> It's possible that chat functionality will be added to `copilot.el` as well down the road. PRs welcome!
+Chat is built-in — see the [Chat](#chat) section above. For a more
+feature-rich alternative, take a look at
+[copilot-chat.el](https://github.com/chep/copilot-chat.el).
 
 ## Team
 
